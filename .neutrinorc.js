@@ -3,6 +3,7 @@ module.exports = {
     ['@neutrinojs/library', {
       name: 'resell-select',
       target: 'node',
+      libraryTarget: 'commonjs2',
       babel: {
         presets: [ 'flow' ],
       },
