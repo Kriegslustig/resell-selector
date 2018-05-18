@@ -62,18 +62,42 @@ const mkModule = () => {
       return _getText(this.node)
     }
 
-    query(...path: Array<string>) {
-      const query = (rawNode, _path) => {
+    query(selector: string) {
+      const checks = []
+      // THE WORST WAY I FOUND TO DO THIS. 🤷‍♀️
+      const exp = /(([^\[\s]+)(\[([^\]]*)\])|([^\[\s]+)|(\[([^\]]*)\]))/g
+
+      let match = null
+      while((match = exp.exec(selector)) !== null) {
+        const rawProps = match[7] || match[4]
+        const type = match[2] || match[5]
+        const props = rawProps && rawProps.split(',')
+          .map((prop) => prop.split('='))
+          .map(([ key, value ]) => [ key, JSON.parse(value) ])
+
+        checks.push(
+          (node: ReactDOMNode) =>
+            (!type || (
+              node.type === type ||
+              (node.type && node.type.displayName === type)
+            )) &&
+            (!props || (
+              props.every(([key, value]) => node.memoizedProps[key] === value)
+            ))
+        )
+      }
+
+      const query = (rawNode, _checks) => {
         if (!rawNode) return rawNode
 
         const node = new Node(rawNode)
-        if (_path.length === 0) return node
-        const [currentName, ...newPath] = _path
-        const foundNode = node._findElement(currentName)
-        return query(foundNode, newPath)
+        if (_checks.length === 0) return node
+        const [currentCheck, ...newChecks] = _checks
+        const foundNode = node._find(currentCheck)
+        return query(foundNode, newChecks)
       }
 
-      return query(this.node, path)
+      return query(this.node, checks)
     }
 
     _wrap(maybeNode: ?ReactDOMNode): ?Node {
@@ -95,7 +119,7 @@ const mkModule = () => {
         return find(node.child) || find(node.sibling)
       }
 
-      return find(this.node)
+      return find(this.node.child)
     }
 
     findElement(type: string) {
@@ -109,8 +133,8 @@ const mkModule = () => {
       ))
     }
 
-    waitFor(...query: Array<string>) {
-      return waitFor(() => this.query(...query))
+    waitFor(query: string) {
+      return waitFor(() => this.query(query))
     }
   }
 
