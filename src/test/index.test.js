@@ -17,7 +17,7 @@ const setup = (children) => {
   )
 
   const root = select.fromRoot(domRoot)
-  const node = new select.Node(root.node.child)
+  const node = select.mkNode(root.reactNode.child)
 
   if (!node) throw new Error()
 
@@ -34,7 +34,7 @@ describe('fromRoot', () => {
 
     const result = select.fromRoot(node)
 
-    expect(result.node).toBeDefined()
+    expect(result.reactNode).toBeDefined()
   })
 })
 
@@ -130,7 +130,7 @@ describe('Node.query', () => {
 
       expect(result).toBeDefined()
       // $FlowFixMe
-      expect(result.node.memoizedProps.id).toBe(expectedId)
+      expect(result.reactNode.memoizedProps.id).toBe(expectedId)
     })
   })
 })
