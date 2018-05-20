@@ -75,7 +75,7 @@ const mkModule = (): Select => {
         const _getText = (_node, isRoot = false) => {
           if (!_node) {
             return ''
-          } else if (_node.stateNode) {
+          } else if (HTMLElement.prototype.isPrototypeOf(_node.stateNode)) {
             return _node.stateNode.textContent || ''
           } else if (node.reactNode === _node) {
             return _getText(_node.child)
