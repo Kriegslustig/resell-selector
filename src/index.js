@@ -72,17 +72,17 @@ const mkModule = (): Select => {
       },
 
       get textContent() {
-        const _getText = (node) => {
-          if (!node) {
+        const _getText = (_node, isRoot = false) => {
+          if (!_node) {
             return ''
-          } else if (node.stateNode) {
-            return node.stateNode.textContent || ''
-          } else if (node.reactNode === node) {
-            return _getText(node.child)
+          } else if (_node.stateNode) {
+            return _node.stateNode.textContent || ''
+          } else if (node.reactNode === _node) {
+            return _getText(_node.child)
           } else {
             return (
-              _getText(node.child) +
-              _getText(node.sibling)
+              _getText(_node.child) +
+              _getText(_node.sibling)
             )
           }
         }
