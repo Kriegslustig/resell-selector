@@ -107,7 +107,8 @@ const mkModule = (): Select => {
             (node: ReactDOMNode) =>
               (!type || (
                 node.type === type ||
-                (node.type && node.type.displayName === type)
+                (node.type && node.type.displayName === type) ||
+                (node.type && node.type.name === type)
               )) &&
               (!props || (
                 props.every(([key, value]) => node.memoizedProps[key] === value)
