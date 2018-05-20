@@ -119,7 +119,9 @@ const mkModule = (): Select => {
               )) &&
               (!props || (
                 props.every(([key, operator, wantedValue]) => {
-                  const value = node.memoizedProps[key]
+                  const value = key === 'textContent'
+                    ? mkNode(node).textContent
+                    : node.memoizedProps[key]
                   if (operator === '=') {
                     return value === wantedValue
                   } else if (operator === '*=' && typeof value === 'string') {

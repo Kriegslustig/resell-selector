@@ -113,6 +113,11 @@ describe('Node.query', () => {
       '[children*="das"]',
       3
     ],
+    [
+      'should match the textContent of an element',
+      'div[textContent*="das"]',
+      1
+    ],
   ].forEach(([ title, selector, expectedId ]) => {
     it(title, () => {
       const { node } = setup(
