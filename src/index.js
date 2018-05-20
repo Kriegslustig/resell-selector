@@ -13,7 +13,10 @@ export type Node = {|
 
   _wrap: (maybeNode: ?ReactDOMNode) => ?Node,
 
-  _find: (fn: (ReactDOMNode) => boolean) => ?ReactDOMNode,
+  _find: (
+    fn: (ReactDOMNode) => boolean,
+    options?: { includeParent: boolean, }
+  ) => ?ReactDOMNode,
   find: (condition: (Node) => boolean) => ?Node,
 
   _findElement: (type: string) => ?ReactDOMNode,
@@ -56,10 +59,12 @@ const mkModule = (): Select => {
       reactNode: reactDomNode,
 
       get domNode() {
-        const maybeNode = node._find((node) =>
-          HTMLElement.prototype.isPrototypeOf(
-            node.stateNode
-          )
+        const maybeNode = node._find(
+          (node) =>
+            HTMLElement.prototype.isPrototypeOf(
+              node.stateNode
+            ),
+          { includeParent: true }
         )
         return maybeNode
           ? maybeNode.stateNode
@@ -133,7 +138,10 @@ const mkModule = (): Select => {
         return node._wrap(node._find(fn))
       },
 
-      _find: (fn: (ReactDOMNode) => boolean): ?ReactDOMNode => {
+      _find: (
+        fn: (ReactDOMNode) => boolean,
+        { includeParent } = {}
+      ): ?ReactDOMNode => {
         const find = (node) => {
           if (!node) return undefined
           if (fn(node)) {
@@ -142,7 +150,11 @@ const mkModule = (): Select => {
           return find(node.child) || find(node.sibling)
         }
 
-        return find(node.reactNode.child)
+        return find(
+          includeParent
+            ? node.reactNode
+            : node.reactNode.child
+        )
       },
 
       findElement: (type: string) => {
