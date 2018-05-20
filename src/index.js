@@ -22,14 +22,22 @@ export type Node = {|
   _findElement: (type: string) => ?ReactDOMNode,
   findElement: (type: string) => ?Node,
 
-  waitFor: (Selector) => Promise<Node>,
+  waitFor: (
+    Selector,
+    timeout?: number,
+    interval?: number,
+  ) => Promise<Node>,
 |}
 
 export type Selector = string
 export type Select = {|
   fromRoot: (HTMLElement) => Node,
   mkNode: (ReactDOMNode) => Node,
-  waitFor: <A>(condition: () => ?A) => Promise<A>,
+  waitFor: <A>(
+    condition: () => ?A,
+    timeout?: number,
+    interval?: number,
+  ) => Promise<A>,
 |}
 
 const mkModule = (): Select => {
@@ -39,7 +47,7 @@ const mkModule = (): Select => {
   const waitFor = <A>(
     cond: () => ?A,
     timeout: number = 5000,
-    interval: number = 100
+    interval: number = 500
   ): Promise<A> =>
     new Promise((resolve, reject) => {
       const result = cond()
@@ -187,8 +195,12 @@ const mkModule = (): Select => {
         ))
       },
 
-      waitFor: (query: string) => {
-        return waitFor(() => node.query(query))
+      waitFor: (query: string, timeout, interval) => {
+        return waitFor(
+          () => node.query(query),
+          timeout,
+          interval
+        )
       },
     }
 
