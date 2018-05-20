@@ -108,6 +108,11 @@ describe('Node.query', () => {
       '[children="dies das"]',
       3
     ],
+    [
+      'should match partial strings with the *= operator',
+      '[children*="das"]',
+      3
+    ],
   ].forEach(([ title, selector, expectedId ]) => {
     it(title, () => {
       const { node } = setup(

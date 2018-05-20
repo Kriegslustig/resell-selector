@@ -100,8 +100,15 @@ const mkModule = (): Select => {
           const rawProps = match[7] || match[4]
           const type = match[2] || match[5]
           const props = rawProps && rawProps.split(',')
-            .map((prop) => prop.split('='))
-            .map(([ key, value ]) => [ key, JSON.parse(value) ])
+            .map((prop) => {
+              const [, key, operator, value] =
+                /^([^*=]+)(\*=|=)(.*)$/.exec(prop)
+              return [
+                key,
+                operator,
+                JSON.parse(value),
+              ]
+            })
 
           checks.push(
             (node: ReactDOMNode) =>
@@ -111,7 +118,16 @@ const mkModule = (): Select => {
                 (node.type && node.type.name === type)
               )) &&
               (!props || (
-                props.every(([key, value]) => node.memoizedProps[key] === value)
+                props.every(([key, operator, wantedValue]) => {
+                  const value = node.memoizedProps[key]
+                  if (operator === '=') {
+                    return value === wantedValue
+                  } else if (operator === '*=' && typeof value === 'string') {
+                    return value.includes(wantedValue)
+                  } else {
+                    return false
+                  }
+                })
               ))
           )
         }
