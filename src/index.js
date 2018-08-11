@@ -41,8 +41,13 @@ export type Select = {|
 |}
 
 const mkModule = (): Select => {
-  const fromRoot = (root: HTMLElement): Node =>
-    mkNode((root: any)._reactRootContainer._internalRoot.current)
+  const fromRoot = (root: HTMLElement): Node => {
+    const container = (root: any)._reactRootContainer
+    const rootNode = container._internalRoot
+      ? container._internalRoot.current
+      : container.current
+    return mkNode(rootNode)
+  }
 
   const waitFor = <A>(
     cond: () => ?A,
