@@ -174,12 +174,19 @@ const mkModule = (): Select => {
         fn: (ReactDOMNode) => boolean,
         { includeParent } = {}
       ): ?ReactDOMNode => {
+        const visitedNodes = new WeakMap()
         const find = (node) => {
           if (!node) return undefined
+          if (visitedNodes.has(node)) return undefined
+          visitedNodes.set(node)
           if (fn(node)) {
             return node
           }
-          return find(node.child) || find(node.sibling)
+          return (
+            find(node.child) ||
+            find(node.sibling) ||
+            find(node.alternate)
+          )
         }
 
         return find(
